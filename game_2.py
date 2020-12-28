@@ -17,6 +17,9 @@ def terminate():
 
 def start_screen():
     screen = pygame.display.set_mode((710, 500))
+    start = pygame.mixer.Sound('Ring05.wav')
+    start.play()
+    pygame.display.set_caption("Инициализация игры")
     fon = pygame.transform.scale(load_image('Fone.png'), (710, 500))
     screen.blit(fon, (0, 0))
     font = pygame.font.Font(None, 30)
@@ -59,6 +62,7 @@ def load_image(name, colorkey=None):
 def lose_screen():
     screen = pygame.display.set_mode((300, 300))
     intro_text = ["Вы проиграли", f"Набрано {x} очков"]
+    pygame.display.set_caption("Итоги игры")
 
     fon = pygame.Surface((300, 300))
     fon.fill((200, 200, 200))
@@ -79,8 +83,7 @@ def lose_screen():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 terminate()
-            elif event.type == pygame.KEYDOWN or \
-                    event.type == pygame.MOUSEBUTTONDOWN:
+            elif event.type == pygame.MOUSEBUTTONDOWN:
                 terminate()
         pygame.display.flip()
         clock.tick(FPS)
@@ -177,6 +180,8 @@ vertical_borders = pygame.sprite.Group()
 bullets = pygame.sprite.Group()
 Border(0, height - 6, width, height - 6)
 bom = pygame.mixer.Sound('Pop_up.wav')
+pygame.display.set_caption("Итоги игры")
+
 mountain = Mountain()
 x = 0
 FPS = 100
