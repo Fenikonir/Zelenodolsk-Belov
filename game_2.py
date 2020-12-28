@@ -31,12 +31,12 @@ def start_screen():
             elif event.type == pygame.KEYDOWN or \
                     event.type == pygame.MOUSEBUTTONDOWN:
                 if 160 <= event.pos[0] <= 160 + 420 and 125 <= event.pos[1] <= 125 + 66:
-                    return 1, 2000, 30
+                    return 1, 2000, 30, 3
                 elif 160 <= event.pos[0] <= 160 + 420 and 125 + 66 + 25 <= event.pos[1] <= 125 + 66 + 25 + 66:
-                    return 3, 1500, 30
+                    return 3, 1500, 30, 2
                 elif 160 <= event.pos[0] <= 160 + 420 and 125 + 2 * 66 + 25 * 2 <= event.pos[
                     1] <= 125 + 3 * 66 + 2 * 25:
-                    return 5, 1000, 50
+                    return 5, 1000, 50, 1
         pygame.display.flip()
         clock.tick(FPS)
 
@@ -113,6 +113,7 @@ class Landing(pygame.sprite.Sprite):
         self.mask = pygame.mask.from_surface(self.image)
         self.rect.x = pos[0]
         self.rect.y = pos[1]
+        self.HP = HP
 
     def update(self):
         self.rect = self.rect.move(0, 1)
@@ -122,7 +123,12 @@ class Landing(pygame.sprite.Sprite):
         if not pygame.sprite.spritecollideany(self, horizontal_borders):
             self.rect = self.rect.move(0, mob_speed)
         else:
-            lose_screen()
+            self.kill()
+            global HP
+            HP -= 1
+            if HP == 0:
+                lose_screen()
+
 
 
 class Border(pygame.sprite.Sprite):
@@ -181,16 +187,17 @@ bullets = pygame.sprite.Group()
 Border(0, height - 6, width, height - 6)
 bom = pygame.mixer.Sound('Pop_up.wav')
 pygame.display.set_caption("Итоги игры")
-
 mountain = Mountain()
+
 x = 0
 FPS = 100
 
 MYEVENTTYPE = pygame.USEREVENT + 1
-
+hp_image = pygame.transform.scale(load_image("yandex.png"), (20, 20))
 pygame.key.set_repeat(200, 70)
 clock = pygame.time.Clock()
-mob_speed, takt, STEP = start_screen()
+mob_speed, takt, STEP, HP = start_screen()
+
 pygame.time.set_timer(MYEVENTTYPE, takt)
 running = True
 while running:
@@ -216,8 +223,9 @@ while running:
     hits = pygame.sprite.groupcollide(mobs, bullets, True, True)
     if hits:
         x += 10
-
     screen.fill((0, 0, 0))
+    for i in range(HP):
+        screen.blit(hp_image, (50 + i * 30, 50))
     all_sprites.draw(screen)
     all_sprites.update()
     gun_car.draw(screen)
