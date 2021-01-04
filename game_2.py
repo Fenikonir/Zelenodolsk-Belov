@@ -100,7 +100,7 @@ def lose_screen():
     font = pygame.font.Font(None, 40)
     text_coord = 30
     for line in intro_text:
-        string_rendered = font.render(line, 1, pygame.Color('black'))
+        string_rendered = font.render(line, True, pygame.Color('black'))
         intro_rect = string_rendered.get_rect()
         text_coord += 10
         intro_rect.top = text_coord
@@ -113,7 +113,7 @@ def lose_screen():
 
     pygame.draw.rect(screen, (255, 255, 255), (50, 250, 200, 40), width=3)
     font = pygame.font.Font(None, 30)
-    string_rendered = font.render(line, 1, pygame.Color('black'))
+    string_rendered = font.render(line, True, pygame.Color('black'))
     intro_rect = string_rendered.get_rect()
     intro_rect.top = 265
     intro_rect.x = 70
@@ -129,12 +129,19 @@ def lose_screen():
                     global running
                     running = False
                     run = False
+            elif event.type == pygame.MOUSEMOTION:
+                if 50 <= event.pos[0] <= 250 and 250 <= event.pos[1] <= 290:
+                    pygame.draw.rect(screen, (255, 200, 200), (50, 250, 200, 40), width=3)
+                else:
+                    pygame.draw.rect(screen, (255, 255, 255), (50, 250, 200, 40), width=3)
+
         pygame.display.flip()
         clock.tick(FPS)
 
 
 class Mountain(pygame.sprite.Sprite):
-    image = load_image("mountains.png")
+    mountains = ["mountains.png", "mountains_2.png", "mountains_3.png", "mountains_4.png"]
+    image = pygame.transform.scale(load_image(random.choice(mountains)), (789, 500))
 
     def __init__(self):
         super().__init__(all_sprites)
@@ -161,9 +168,6 @@ class Landing(pygame.sprite.Sprite):
 
     def update(self):
         self.rect = self.rect.move(0, 1)
-
-    def update(self):
-        # если ещё в небе
         if not pygame.sprite.spritecollideany(self, horizontal_borders):
             self.rect = self.rect.move(0, mob_speed)
         else:
@@ -251,7 +255,7 @@ while True:
                 running = False
                 terminate()
             if event.type == MYEVENTTYPE:
-                Landing((random.randrange(width - 100), 0))
+                Landing((random.randrange(width - 200), 0))
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RIGHT:
                     if gun.rect.x < width + 32:
@@ -270,14 +274,13 @@ while True:
         if hits:
             x += 10
         screen.fill((0, 0, 0))
-        for i in range(HP):
-            screen.blit(hp_image, (50 + i * 30, 50))
+
         all_sprites.draw(screen)
         all_sprites.update()
         gun_car.draw(screen)
         mobs.draw(screen)
         mobs.update()
+        for i in range(HP):
+            screen.blit(hp_image, (50 + i * 30, 50))
         pygame.display.flip()
         clock.tick(50)
-
-pygame.quit()
