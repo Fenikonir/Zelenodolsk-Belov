@@ -16,9 +16,52 @@ def terminate():
     sys.exit()
 
 
+def star_screen_info():
+    screen = pygame.display.set_mode((789, 500))
+    start.play()
+    pygame.display.set_caption("Инициализация игры")
+    fon = pygame.transform.scale(load_image('start_screen.png'), (789, 500))
+    screen.blit(fon, (0, 0))
+    pygame.draw.rect(screen, (255, 255, 255), (204, 133, 429, 94), width=2)
+    choose = [200, 133]
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_DOWN:
+                    if choose[1] == 133:
+                        choose[1] += 42 + 90
+                    else:
+                        choose[1] = 133
+                elif event.key == pygame.K_UP:
+                    if choose[1] == 42 + 90:
+                        choose[1] = 133
+                    else:
+                        choose[1] -= (42 + 90)
+                if event.key == pygame.K_RETURN or event.key == pygame.K_SPACE:
+                    if choose[1] == 133:
+                        return 0
+                    else:
+                        return 1
+            if event.type == pygame.MOUSEMOTION:
+                if 204 <= event.pos[0] <= 204 + 425 and 133 <= event.pos[1] <= 133 + 90:
+                    choose[1] = 133
+                elif 204 <= event.pos[0] <= 204 + 425 and 133 + 90 + 40 <= event.pos[1] <= 133 + 40 + 2 * 90:
+                    choose[1] = 133 + 42 + 90
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if 204 <= event.pos[0] <= 204 + 425 and 133 <= event.pos[1] <= 133 + 90:
+                    return 0
+                elif 204 <= event.pos[0] <= 204 + 425 and 133 + 90 + 40 <= event.pos[1] <= 133 + 40 + 2 * 90:
+                    return 1
+        screen.fill((0, 0, 0))
+        screen.blit(fon, (0, 0))
+        pygame.draw.rect(screen, (0, 255, 0), (choose[0], choose[1], 429, 94), width=6)
+        pygame.display.flip()
+
+
 def start_screen():
     screen = pygame.display.set_mode((710, 500))
-    start.play()
     pygame.display.set_caption("Инициализация игры")
     fon = pygame.transform.scale(load_image('Fone.png'), (710, 500))
     screen.blit(fon, (0, 0))
@@ -86,6 +129,63 @@ def load_image(name, colorkey=None):
     else:
         image = image.convert_alpha()
     return image
+
+
+def mission_screen():
+    screen = pygame.display.set_mode((788, 500))
+    pygame.display.set_caption("Инициализация игры")
+    fon = pygame.transform.scale(load_image('mission_screen.png'), (788, 500))
+    screen.blit(fon, (0, 0))
+
+    font = pygame.font.Font('data/B_font.ttf', 80)
+    text_coord = [140, 120]
+    col = 1
+    for i in range(3):
+        for j in range(5):
+            if i == 0:
+                color = (100, 160, 100)
+            elif i == 1:
+                color = (200, 200, 0)
+            else:
+                color = (255, 0, 0)
+            x = text_coord[0] + 100 * j
+            y = text_coord[1] + 100 * i
+            pygame.draw.rect(screen, color, (x, y, 80, 80), width=9)
+            string_rendered = font.render(str(col), True, color)
+            col += 1
+            #     intro_rect = string_rendered.get_rect()
+            #     text_coord += 10
+            #     intro_rect.top = text_coord
+            #     intro_rect.x = 10
+            #     text_coord += intro_rect.height
+            screen.blit(string_rendered, (x + 4, y + 4))
+    run = True
+    while run:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            elif event.type == pygame.MOUSEBUTTONDOWN or event.type == pygame.MOUSEMOTION:
+                for i in range(3):
+                    for j in range(5):
+                        if i == 0:
+                            color = (100, 160, 100)
+                        elif i == 1:
+                            color = (200, 200, 0)
+                        else:
+                            color = (255, 0, 0)
+                        x = text_coord[0] + 100 * j
+                        y = text_coord[1] + 100 * i
+                        pygame.draw.rect(screen, color, (x, y, 80, 80), width=9)
+                        if text_coord[0] + 100 * j <= event.pos[0] <= text_coord[0] + 100 * j + 80 and text_coord[
+                            1] + 100 * i <= event.pos[1] <= text_coord[1] + 100 * i + 80:
+                            x = text_coord[0] + 100 * j
+                            y = text_coord[1] + 100 * i
+                            pygame.draw.rect(screen, (255, 255, 255), (x, y, 80, 80), width=9)
+                            if event.type == pygame.MOUSEBUTTONDOWN:
+                                return i + j
+                                run = False
+
+        pygame.display.flip()
 
 
 def lose_screen():
@@ -171,6 +271,7 @@ class Landing(pygame.sprite.Sprite):
         if not pygame.sprite.spritecollideany(self, horizontal_borders):
             self.rect = self.rect.move(0, mob_speed)
         else:
+            health.play()
             self.kill()
             global HP
             HP -= 1
@@ -210,7 +311,7 @@ class GunCar(pygame.sprite.Sprite):
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, x, y):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.transform.scale(load_image("bullet.png"), (15, 30))
+        self.image = pygame.transform.scale(load_image("bullet.png"), (30, 60))
         self.rect = self.image.get_rect()
         self.rect.bottom = y
         self.rect.centerx = x
@@ -224,6 +325,8 @@ class Bullet(pygame.sprite.Sprite):
 
 
 while True:
+    x = 0
+    y = star_screen_info()
     screen = pygame.display.set_mode(size)
     gun_car = pygame.sprite.Group()
     gun = GunCar()
@@ -234,21 +337,25 @@ while True:
     bullets = pygame.sprite.Group()
     Border(0, height - 6, width, height - 6)
     mountain = Mountain()
+    font = pygame.font.Font('data/B_font.ttf', 40)
 
-    x = 0
     FPS = 100
 
     MYEVENTTYPE = pygame.USEREVENT + 1
-    hp_image = pygame.transform.scale(load_image("yandex.png"), (20, 20))
+    hp_image = pygame.transform.scale(load_image("health.png"), (40, 40))
 
     pygame.key.set_repeat(200, 70)
     clock = pygame.time.Clock()
-    mob_speed, takt, STEP, HP = start_screen()
+    if y == 1:
+        mob_speed, takt, STEP, HP = start_screen()
+    else:
+        mission_screen()
 
     pygame.time.set_timer(MYEVENTTYPE, takt)
     running = True
     pygame.display.set_caption("Поймай диверсантов")
     bom = pygame.mixer.Sound('data/Pop_up.wav')
+    health = pygame.mixer.Sound("data/health.wav")
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -279,8 +386,15 @@ while True:
         all_sprites.update()
         gun_car.draw(screen)
         mobs.draw(screen)
+
+        string_rendered = font.render(str(x), True, pygame.Color('white'))
+        intro_rect = string_rendered.get_rect()
+        intro_rect.x = 600
+        intro_rect.y = 50
+        screen.blit(string_rendered, intro_rect)
+
         mobs.update()
         for i in range(HP):
-            screen.blit(hp_image, (50 + i * 30, 50))
+            screen.blit(hp_image, (50 + i * 50, 50))
         pygame.display.flip()
         clock.tick(50)
