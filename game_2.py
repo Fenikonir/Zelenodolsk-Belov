@@ -35,10 +35,10 @@ def star_screen_info():
                     else:
                         choose[1] = 133
                 elif event.key == pygame.K_UP:
-                    if choose[1] == 42 + 90:
+                    if choose[1] == 133 + 42 + 90:
                         choose[1] = 133
                     else:
-                        choose[1] -= (42 + 90)
+                        choose[1] = 133 + 42 + 90
                 if event.key == pygame.K_RETURN or event.key == pygame.K_SPACE:
                     if choose[1] == 133:
                         return 0
@@ -165,6 +165,7 @@ def mission_screen():
             if event.type == pygame.QUIT:
                 terminate()
             elif event.type == pygame.MOUSEBUTTONDOWN or event.type == pygame.MOUSEMOTION:
+                col = 1
                 for i in range(3):
                     for j in range(5):
                         if i == 0:
@@ -176,13 +177,14 @@ def mission_screen():
                         x = text_coord[0] + 100 * j
                         y = text_coord[1] + 100 * i
                         pygame.draw.rect(screen, color, (x, y, 80, 80), width=9)
+                        col += 1
                         if text_coord[0] + 100 * j <= event.pos[0] <= text_coord[0] + 100 * j + 80 and text_coord[
                             1] + 100 * i <= event.pos[1] <= text_coord[1] + 100 * i + 80:
                             x = text_coord[0] + 100 * j
                             y = text_coord[1] + 100 * i
                             pygame.draw.rect(screen, (255, 255, 255), (x, y, 80, 80), width=9)
                             if event.type == pygame.MOUSEBUTTONDOWN:
-                                return i + j
+                                return col
                                 run = False
 
         pygame.display.flip()
@@ -237,6 +239,55 @@ def lose_screen():
 
         pygame.display.flip()
         clock.tick(FPS)
+
+
+def victory():
+    screen = pygame.display.set_mode((300, 300))
+    intro_text = ["Вы выйграли", f"Набрано {x} очков"]
+    pygame.display.set_caption("Итоги игры")
+
+    fon = pygame.Surface((300, 300))
+    fon.fill((200, 200, 200))
+
+    screen.blit(fon, (0, 0))
+    font = pygame.font.Font(None, 40)
+    text_coord = 30
+    for line in intro_text:
+        string_rendered = font.render(line, True, pygame.Color('black'))
+        intro_rect = string_rendered.get_rect()
+        text_coord += 10
+        intro_rect.top = text_coord
+        intro_rect.x = 10
+        text_coord += intro_rect.height
+        screen.blit(string_rendered, intro_rect)
+    line = "Начать заново"
+    pygame.draw.rect(screen, (255, 255, 255), (50, 250, 200, 40), width=3)
+    font = pygame.font.Font(None, 30)
+    string_rendered = font.render(line, True, pygame.Color('black'))
+    intro_rect = string_rendered.get_rect()
+    intro_rect.top = 265
+    intro_rect.x = 70
+
+    screen.blit(string_rendered, intro_rect)
+    run = True
+    while run:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if 50 <= event.pos[0] <= 250 and 250 <= event.pos[1] <= 290:
+                    global running
+                    running = False
+                    run = False
+            elif event.type == pygame.MOUSEMOTION:
+                if 50 <= event.pos[0] <= 250 and 250 <= event.pos[1] <= 290:
+                    pygame.draw.rect(screen, (255, 200, 200), (50, 250, 200, 40), width=3)
+                else:
+                    pygame.draw.rect(screen, (255, 255, 255), (50, 250, 200, 40), width=3)
+
+        pygame.display.flip()
+        clock.tick(FPS)
+
 
 
 class Mountain(pygame.sprite.Sprite):
@@ -349,52 +400,106 @@ while True:
     if y == 1:
         mob_speed, takt, STEP, HP = start_screen()
     else:
-        mission_screen()
+        mob_col = 10 + mission_screen() * 2
+        if mob_col <= 20:
+            mob_speed, takt, STEP, HP = 1, 2000, 30, 3
+        elif mob_col <= 30:
+            mob_speed, takt, STEP, HP = 3, 1500, 30, 2
+        else:
+            mob_speed, takt, STEP, HP = 5, 1000, 50, 1
 
     pygame.time.set_timer(MYEVENTTYPE, takt)
     running = True
     pygame.display.set_caption("Поймай диверсантов")
     bom = pygame.mixer.Sound('data/Pop_up.wav')
     health = pygame.mixer.Sound("data/health.wav")
-    while running:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-                terminate()
-            if event.type == MYEVENTTYPE:
-                Landing((random.randrange(width - 200), 0))
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_RIGHT:
-                    if gun.rect.x < width + 32:
-                        gun.rect.x += STEP
-                    else:
-                        gun.rect.x = 0
-                if event.key == pygame.K_LEFT:
-                    if gun.rect.x > 0 - 32:
-                        gun.rect.x -= STEP
-                    else:
-                        gun.rect.x = width - 32
-                if event.key == pygame.K_SPACE:
-                    gun.shoot()
-                    bom.play()
-        hits = pygame.sprite.groupcollide(mobs, bullets, True, True)
-        if hits:
-            x += 10
-        screen.fill((0, 0, 0))
+    if y == 1:
+        while running:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                    terminate()
+                if event.type == MYEVENTTYPE:
+                    Landing((random.randrange(width - 200), 0))
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_RIGHT:
+                        if gun.rect.x < width + 32:
+                            gun.rect.x += STEP
+                        else:
+                            gun.rect.x = 0
+                    if event.key == pygame.K_LEFT:
+                        if gun.rect.x > 0 - 32:
+                            gun.rect.x -= STEP
+                        else:
+                            gun.rect.x = width - 32
+                    if event.key == pygame.K_SPACE:
+                        gun.shoot()
+                        bom.play()
+            hits = pygame.sprite.groupcollide(mobs, bullets, True, True)
+            if hits:
+                x += 10
+            screen.fill((0, 0, 0))
 
-        all_sprites.draw(screen)
-        all_sprites.update()
-        gun_car.draw(screen)
-        mobs.draw(screen)
+            all_sprites.draw(screen)
+            all_sprites.update()
+            gun_car.draw(screen)
+            mobs.draw(screen)
 
-        string_rendered = font.render(str(x), True, pygame.Color('white'))
-        intro_rect = string_rendered.get_rect()
-        intro_rect.x = 600
-        intro_rect.y = 50
-        screen.blit(string_rendered, intro_rect)
+            string_rendered = font.render(str(x), True, pygame.Color('white'))
+            intro_rect = string_rendered.get_rect()
+            intro_rect.x = 600
+            intro_rect.y = 50
+            screen.blit(string_rendered, intro_rect)
 
-        mobs.update()
-        for i in range(HP):
-            screen.blit(hp_image, (50 + i * 50, 50))
-        pygame.display.flip()
-        clock.tick(50)
+            mobs.update()
+            for i in range(HP):
+                screen.blit(hp_image, (50 + i * 50, 50))
+            pygame.display.flip()
+            clock.tick(50)
+    else:
+        running = True
+        while mob_col != 0 and running:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                    terminate()
+                if event.type == MYEVENTTYPE:
+                    Landing((random.randrange(width - 200), 0))
+
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_RIGHT:
+                        if gun.rect.x < width + 32:
+                            gun.rect.x += STEP
+                        else:
+                            gun.rect.x = 0
+                    if event.key == pygame.K_LEFT:
+                        if gun.rect.x > 0 - 32:
+                            gun.rect.x -= STEP
+                        else:
+                            gun.rect.x = width - 32
+                    if event.key == pygame.K_SPACE:
+                        gun.shoot()
+                        bom.play()
+            hits = pygame.sprite.groupcollide(mobs, bullets, True, True)
+            if hits:
+                x += 10
+                mob_col -= 1
+            screen.fill((0, 0, 0))
+
+            all_sprites.draw(screen)
+            all_sprites.update()
+            gun_car.draw(screen)
+            mobs.draw(screen)
+
+            string_rendered = font.render(str(x), True, pygame.Color('white'))
+            intro_rect = string_rendered.get_rect()
+            intro_rect.x = 600
+            intro_rect.y = 50
+            screen.blit(string_rendered, intro_rect)
+
+            mobs.update()
+            for i in range(HP):
+                screen.blit(hp_image, (50 + i * 50, 50))
+            pygame.display.flip()
+            clock.tick(50)
+        victory()
