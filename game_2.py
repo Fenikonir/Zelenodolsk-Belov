@@ -289,7 +289,6 @@ def victory():
         clock.tick(FPS)
 
 
-
 class Mountain(pygame.sprite.Sprite):
     mountains = ["mountains.png", "mountains_2.png", "mountains_3.png", "mountains_4.png"]
     image = pygame.transform.scale(load_image(random.choice(mountains)), (789, 500))
@@ -388,6 +387,7 @@ while True:
     Border(0, height - 6, width, height - 6)
     mountain = Mountain()
     font = pygame.font.Font('data/B_font.ttf', 40)
+    pause = pygame.transform.scale(load_image("pause.png"), (60, 60))
 
     FPS = 100
 
@@ -419,10 +419,34 @@ while True:
                 if event.type == pygame.QUIT:
                     running = False
                     terminate()
-                if event.type == MYEVENTTYPE:
-                    pt = random.choice([("pt_3.png"), ("pt_4.png")])
-                    Landing((random.randrange(width - 200), 0), pt)
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if 720 <= event.pos[0] <= 780 and 30 <= event.pos[1] <= 90:
+                        runn = True
+                        while runn:
+                            for event in pygame.event.get():
+                                if event.type == pygame.KEYDOWN:
+                                    if event.key == pygame.K_ESCAPE:
+                                        runn = False
+                                elif event.type == pygame.MOUSEBUTTONDOWN:
+                                    if 720 <= event.pos[0] <= 780 and 30 <= event.pos[1] <= 90:
+                                        runn = False
+                    if event.type == MYEVENTTYPE:
+                        pt = random.choice([("pt_3.png"), ("pt_4.png")])
+                        Landing((random.randrange(width - 200), 0), pt)
                 elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        runn = True
+                        while runn:
+                            for event in pygame.event.get():
+                                if event.type == pygame.QUIT:
+                                    running = False
+                                    terminate()
+                                if event.type == pygame.KEYDOWN:
+                                    if event.key == pygame.K_ESCAPE:
+                                        runn = False
+                                elif event.type == pygame.MOUSEBUTTONDOWN:
+                                    if 720 <= event.pos[0] <= 780 and 30 <= event.pos[1] <= 90:
+                                        runn = False
                     if event.key == pygame.K_RIGHT:
                         if gun.rect.x < width + 32:
                             gun.rect.x += STEP
@@ -440,7 +464,7 @@ while True:
             if hits:
                 x += 10
             screen.fill((0, 0, 0))
-
+            screen.blit(pause, (720, 30))
             all_sprites.draw(screen)
             all_sprites.update()
             gun_car.draw(screen)
@@ -465,11 +489,36 @@ while True:
                 if event.type == pygame.QUIT:
                     running = False
                     terminate()
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if 720 <= event.pos[0] <= 780 and 30 <= event.pos[1] <= 90:
+                        runn = True
+                        while runn:
+                            for event in pygame.event.get():
+                                if event.type == pygame.KEYDOWN:
+                                    if event.key == pygame.K_ESCAPE:
+                                        runn = False
+                                elif event.type == pygame.MOUSEBUTTONDOWN:
+                                    if 720 <= event.pos[0] <= 780 and 30 <= event.pos[1] <= 90:
+                                        runn = False
                 if event.type == MYEVENTTYPE:
                     pt = random.choice([("pt_3.png"), ("pt_4.png")])
                     Landing((random.randrange(width - 200), 0), pt)
 
                 elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        runn = True
+                        while runn:
+                            for event in pygame.event.get():
+                                if event.type == pygame.QUIT:
+                                    running = False
+                                    terminate()
+                                if event.type == pygame.KEYDOWN:
+
+                                    if event.key == pygame.K_ESCAPE:
+                                        runn = False
+                                elif event.type == pygame.MOUSEBUTTONDOWN:
+                                    if 720 <= event.pos[0] <= 780 and 30 <= event.pos[1] <= 90:
+                                        runn = False
                     if event.key == pygame.K_RIGHT:
                         if gun.rect.x < width + 32:
                             gun.rect.x += STEP
@@ -493,6 +542,7 @@ while True:
             all_sprites.update()
             gun_car.draw(screen)
             mobs.draw(screen)
+            screen.blit(pause, (720, 30))
 
             string_rendered = font.render(str(x), True, pygame.Color('white'))
             intro_rect = string_rendered.get_rect()
