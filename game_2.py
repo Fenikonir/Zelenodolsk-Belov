@@ -305,11 +305,10 @@ class Mountain(pygame.sprite.Sprite):
 
 
 class Landing(pygame.sprite.Sprite):
-    image = load_image("pt.png")
-
-    def __init__(self, pos):
+    def __init__(self, pos, pt):
         super().__init__(mobs)
-        self.image = Landing.image
+        image = pygame.transform.scale(load_image(pt), (60, 60))
+        self.image = image
         self.rect = self.image.get_rect()
         # вычисляем маску для эффективного сравнения
         self.mask = pygame.mask.from_surface(self.image)
@@ -395,24 +394,25 @@ while True:
     MYEVENTTYPE = pygame.USEREVENT + 1
     hp_image = pygame.transform.scale(load_image("health.png"), (40, 40))
 
-    pygame.key.set_repeat(200, 70)
+    pygame.key.set_repeat(200, 30)
     clock = pygame.time.Clock()
     if y == 1:
         mob_speed, takt, STEP, HP = start_screen()
     else:
         mob_col = 10 + mission_screen() * 2
-        if mob_col <= 20:
-            mob_speed, takt, STEP, HP = 1, 2000, 30, 3
-        elif mob_col <= 30:
-            mob_speed, takt, STEP, HP = 3, 1500, 30, 2
+        if mob_col <= 22:
+            mob_speed, takt, STEP, HP = 1, 2000, 10, 3
+        elif mob_col <= 33:
+            mob_speed, takt, STEP, HP = 3, 1500, 10, 2
         else:
-            mob_speed, takt, STEP, HP = 5, 1000, 50, 1
+            mob_speed, takt, STEP, HP = 5, 1000, 20, 1
 
     pygame.time.set_timer(MYEVENTTYPE, takt)
     running = True
     pygame.display.set_caption("Поймай диверсантов")
     bom = pygame.mixer.Sound('data/Pop_up.wav')
     health = pygame.mixer.Sound("data/health.wav")
+
     if y == 1:
         while running:
             for event in pygame.event.get():
@@ -420,7 +420,8 @@ while True:
                     running = False
                     terminate()
                 if event.type == MYEVENTTYPE:
-                    Landing((random.randrange(width - 200), 0))
+                    pt = random.choice([("pt_3.png"), ("pt_4.png")])
+                    Landing((random.randrange(width - 200), 0), pt)
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_RIGHT:
                         if gun.rect.x < width + 32:
@@ -454,6 +455,7 @@ while True:
             mobs.update()
             for i in range(HP):
                 screen.blit(hp_image, (50 + i * 50, 50))
+
             pygame.display.flip()
             clock.tick(50)
     else:
@@ -464,7 +466,8 @@ while True:
                     running = False
                     terminate()
                 if event.type == MYEVENTTYPE:
-                    Landing((random.randrange(width - 200), 0))
+                    pt = random.choice([("pt_3.png"), ("pt_4.png")])
+                    Landing((random.randrange(width - 200), 0), pt)
 
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_RIGHT:
