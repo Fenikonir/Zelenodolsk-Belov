@@ -137,7 +137,7 @@ def mission_screen():
     fon = pygame.transform.scale(load_image('mission_screen.png'), (788, 500))
     screen.blit(fon, (0, 0))
 
-    font = pygame.font.Font('data/B_font.ttf', 80)
+    font = pygame.font.Font('data/B_font.ttf', 75)
     text_coord = [140, 120]
     col = 1
     for i in range(3):
@@ -219,6 +219,8 @@ def lose_screen():
     intro_rect = string_rendered.get_rect()
     intro_rect.top = 265
     intro_rect.x = 70
+    global win
+    win = False
 
     screen.blit(string_rendered, intro_rect)
     run = True
@@ -388,6 +390,7 @@ while True:
     mountain = Mountain()
     font = pygame.font.Font('data/B_font.ttf', 40)
     pause = pygame.transform.scale(load_image("pause.png"), (60, 60))
+    win = True
 
     FPS = 100
 
@@ -555,4 +558,5 @@ while True:
                 screen.blit(hp_image, (50 + i * 50, 50))
             pygame.display.flip()
             clock.tick(50)
-        victory()
+        if win:
+            victory()
