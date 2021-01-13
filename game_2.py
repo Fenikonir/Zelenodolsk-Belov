@@ -308,7 +308,7 @@ class Mountain(pygame.sprite.Sprite):
 class Landing(pygame.sprite.Sprite):
     def __init__(self, pos, pt):
         super().__init__(mobs)
-        image = pygame.transform.scale(load_image(pt), (60, 60))
+        image = pt
         self.image = image
         self.rect = self.image.get_rect()
         # вычисляем маску для эффективного сравнения
@@ -334,14 +334,9 @@ class Border(pygame.sprite.Sprite):
     # строго вертикальный или строго горизонтальный отрезок
     def __init__(self, x1, y1, x2, y2):
         super().__init__(all_sprites)
-        if x1 == x2:  # вертикальная стенка
-            self.add(vertical_borders)
-            self.image = pygame.Surface([1, y2 - y1])
-            self.rect = pygame.Rect(x1, y1, 1, y2 - y1)
-        else:  # горизонтальная стенка
-            self.add(horizontal_borders)
-            self.image = pygame.Surface([x2 - x1, 1])
-            self.rect = pygame.Rect(x1, y1, x2 - x1, 1)
+        self.add(horizontal_borders)
+        self.image = pygame.Surface([x2 - x1, 1])
+        self.rect = pygame.Rect(x1, y1, x2 - x1, 1)
 
 
 class GunCar(pygame.sprite.Sprite):
@@ -375,25 +370,24 @@ class Bullet(pygame.sprite.Sprite):
             self.kill()
 
 
+pt_3 = pygame.transform.scale(load_image("pt_3.png"), (60, 60))
+pt_4 = pygame.transform.scale(load_image("pt_4.png"), (60, 60))
+gun_car = pygame.sprite.Group()
+gun = GunCar()
+all_sprites = pygame.sprite.Group()
+mobs = pygame.sprite.Group()
+horizontal_borders = pygame.sprite.Group()
+bullets = pygame.sprite.Group()
+FPS = 100
 while True:
     x = 0
     y = star_screen_info()
     screen = pygame.display.set_mode(size)
-    gun_car = pygame.sprite.Group()
-    gun = GunCar()
-    all_sprites = pygame.sprite.Group()
-    mobs = pygame.sprite.Group()
-    horizontal_borders = pygame.sprite.Group()
-    vertical_borders = pygame.sprite.Group()
-    bullets = pygame.sprite.Group()
     Border(0, height - 6, width, height - 6)
     mountain = Mountain()
     font = pygame.font.Font('data/B_font.ttf', 40)
     pause = pygame.transform.scale(load_image("pause.png"), (60, 60))
     win = True
-
-    FPS = 100
-
     MYEVENTTYPE = pygame.USEREVENT + 1
     hp_image = pygame.transform.scale(load_image("health.png"), (40, 40))
 
@@ -433,9 +427,9 @@ while True:
                                 elif event.type == pygame.MOUSEBUTTONDOWN:
                                     if 720 <= event.pos[0] <= 780 and 30 <= event.pos[1] <= 90:
                                         runn = False
-                    if event.type == MYEVENTTYPE:
-                        pt = random.choice([("pt_3.png"), ("pt_4.png")])
-                        Landing((random.randrange(width - 200), 0), pt)
+                if event.type == MYEVENTTYPE:
+                    pt = random.choice([pt_3, pt_4])
+                    Landing((random.randrange(width - 200), 0), pt)
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         runn = True
@@ -504,7 +498,7 @@ while True:
                                     if 720 <= event.pos[0] <= 780 and 30 <= event.pos[1] <= 90:
                                         runn = False
                 if event.type == MYEVENTTYPE:
-                    pt = random.choice([("pt_3.png"), ("pt_4.png")])
+                    pt = random.choice([pt_3, pt_4])
                     Landing((random.randrange(width - 200), 0), pt)
 
                 elif event.type == pygame.KEYDOWN:
