@@ -66,6 +66,7 @@ def star_screen_info():
 def start_screen():
     return_b = pygame.transform.scale(load_image("return.png"), (60, 60))
     screen = pygame.display.set_mode((710, 500))
+    global running, win
     pygame.display.set_caption("Инициализация игры")
     fon = pygame.transform.scale(load_image('Fone.png'), (710, 500))
     screen.blit(fon, (0, 0))
@@ -77,6 +78,10 @@ def start_screen():
                 terminate()
                 return 0, 0, 0, 0
             elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    win = False
+                    running = False
+                    return 1, 2000, 30, 3
                 if event.key == pygame.K_DOWN:
                     if choose[1] != 125 + 2 * 66 + 25 * 2:
                         choose[1] += 66 + 25
@@ -104,7 +109,6 @@ def start_screen():
                     choose[1] = 125 + 2 * 66 + 2 * 25
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if 10 <= event.pos[0] <= 70 and 110 <= event.pos[1] <= 170:
-                    global running, win
                     win = False
                     running = False
                     return 1, 2000, 30, 3
@@ -148,7 +152,7 @@ def mission_screen():
     fon = pygame.transform.scale(load_image('mission_screen.png'), (788, 500))
     screen.blit(fon, (0, 0))
     screen.blit(return_b, (10, 10))
-
+    global running, win
     font = pygame.font.Font('data/B_font.ttf', 75)
     text_coord = [140, 120]
     col = 1
@@ -174,10 +178,14 @@ def mission_screen():
             elif event.type == pygame.MOUSEBUTTONDOWN or event.type == pygame.MOUSEMOTION:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if 10 <= event.pos[0] <= 70 and 10 <= event.pos[1] <= 70:
-                        global running, win
                         win = False
                         running = False
                         return 0
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    win = False
+                    running = False
+                    return 0
                 col = 1
                 for i in range(3):
                     for j in range(5):
@@ -425,6 +433,7 @@ while True:
 
     if y == 1:
         while running:
+            screen.blit(pause, (720 - 88, 30))
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
@@ -489,9 +498,9 @@ while True:
             mobs.update()
             for i in range(HP):
                 screen.blit(hp_image, (50 + i * 50, 50))
-
-            pygame.display.flip()
             screen.blit(pause, (720 - 88, 30))
+            pygame.display.flip()
+
             clock.tick(50)
     else:
         while mob_col != 0 and running:
