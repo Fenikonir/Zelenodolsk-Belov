@@ -17,11 +17,13 @@ def terminate():
 
 
 def star_screen_info():
+    # return_b = pygame.transform.scale(load_image("return.png"), (60, 60))
     screen = pygame.display.set_mode((789, 500))
     start.play()
     pygame.display.set_caption("Инициализация игры")
     fon = pygame.transform.scale(load_image('start_screen.png'), (789, 500))
     screen.blit(fon, (0, 0))
+    # screen.blit(return_b, (10, 10))
     pygame.draw.rect(screen, (255, 255, 255), (204, 133, 429, 94), width=2)
     choose = [200, 133]
     while True:
@@ -56,11 +58,13 @@ def star_screen_info():
                     return 1
         screen.fill((0, 0, 0))
         screen.blit(fon, (0, 0))
+        # screen.blit(return_b, (10, 10))
         pygame.draw.rect(screen, (0, 255, 0), (choose[0], choose[1], 429, 94), width=6)
         pygame.display.flip()
 
 
 def start_screen():
+    return_b = pygame.transform.scale(load_image("return.png"), (60, 60))
     screen = pygame.display.set_mode((710, 500))
     pygame.display.set_caption("Инициализация игры")
     fon = pygame.transform.scale(load_image('Fone.png'), (710, 500))
@@ -99,6 +103,11 @@ def start_screen():
                     1] <= 125 + 3 * 66 + 2 * 25:
                     choose[1] = 125 + 2 * 66 + 2 * 25
             elif event.type == pygame.MOUSEBUTTONDOWN:
+                if 10 <= event.pos[0] <= 70 and 110 <= event.pos[1] <= 170:
+                    global running, win
+                    win = False
+                    running = False
+                    return 1, 2000, 30, 3
                 if 160 <= event.pos[0] <= 160 + 420 and 125 <= event.pos[1] <= 125 + 66:
                     return 1, 2000, 30, 3
                 elif 160 <= event.pos[0] <= 160 + 420 and 125 + 66 + 25 <= event.pos[1] <= 125 + 66 + 25 + 66:
@@ -108,6 +117,7 @@ def start_screen():
                     return 5, 1000, 50, 1
         screen.fill((0, 0, 0))
         screen.blit(fon, (0, 0))
+        screen.blit(return_b, (10, 110))
         pygame.draw.rect(screen, (255, 255, 255), (choose[0], choose[1], 420, 66), width=2)
         pygame.display.flip()
         clock.tick(FPS)
@@ -132,10 +142,12 @@ def load_image(name, colorkey=None):
 
 
 def mission_screen():
+    return_b = pygame.transform.scale(load_image("return.png"), (60, 60))
     screen = pygame.display.set_mode((788, 500))
     pygame.display.set_caption("Инициализация игры")
     fon = pygame.transform.scale(load_image('mission_screen.png'), (788, 500))
     screen.blit(fon, (0, 0))
+    screen.blit(return_b, (10, 10))
 
     font = pygame.font.Font('data/B_font.ttf', 75)
     text_coord = [140, 120]
@@ -153,11 +165,6 @@ def mission_screen():
             pygame.draw.rect(screen, color, (x, y, 80, 80), width=9)
             string_rendered = font.render(str(col), True, color)
             col += 1
-            #     intro_rect = string_rendered.get_rect()
-            #     text_coord += 10
-            #     intro_rect.top = text_coord
-            #     intro_rect.x = 10
-            #     text_coord += intro_rect.height
             screen.blit(string_rendered, (x + 4, y + 4))
     run = True
     while run:
@@ -165,6 +172,12 @@ def mission_screen():
             if event.type == pygame.QUIT:
                 terminate()
             elif event.type == pygame.MOUSEBUTTONDOWN or event.type == pygame.MOUSEMOTION:
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if 10 <= event.pos[0] <= 70 and 10 <= event.pos[1] <= 70:
+                        global running, win
+                        win = False
+                        running = False
+                        return 0
                 col = 1
                 for i in range(3):
                     for j in range(5):
@@ -292,12 +305,9 @@ def victory():
 
 
 class Mountain(pygame.sprite.Sprite):
-    mountains = ["mountains.png", "mountains_2.png", "mountains_3.png", "mountains_4.png"]
-    image = pygame.transform.scale(load_image(random.choice(mountains)), (789, 500))
-
-    def __init__(self):
+    def __init__(self, mount):
         super().__init__(all_sprites)
-        self.image = Mountain.image
+        self.image = pygame.transform.scale(load_image(mount), (789, 500))
         self.rect = self.image.get_rect()
         # вычисляем маску для эффективного сравнения
         self.mask = pygame.mask.from_surface(self.image)
@@ -308,7 +318,8 @@ class Mountain(pygame.sprite.Sprite):
 class Landing(pygame.sprite.Sprite):
     def __init__(self, pos, pt):
         super().__init__(mobs)
-        image = pt
+        image = pt[0]
+        self.pt = pt[1]
         self.image = image
         self.rect = self.image.get_rect()
         # вычисляем маску для эффективного сравнения
@@ -320,7 +331,10 @@ class Landing(pygame.sprite.Sprite):
     def update(self):
         self.rect = self.rect.move(0, 1)
         if not pygame.sprite.spritecollideany(self, horizontal_borders):
-            self.rect = self.rect.move(0, mob_speed)
+            if self.pt == 3:
+                self.rect = self.rect.move(0, mob_speed)
+            else:
+                self.rect = self.rect.move(random.randint(-2, 2), mob_speed)
         else:
             health.play()
             self.kill()
@@ -380,32 +394,31 @@ horizontal_borders = pygame.sprite.Group()
 bullets = pygame.sprite.Group()
 FPS = 100
 while True:
+    running = True
     x = 0
     y = star_screen_info()
     screen = pygame.display.set_mode(size)
     Border(0, height - 6, width, height - 6)
-    mountain = Mountain()
     font = pygame.font.Font('data/B_font.ttf', 40)
     pause = pygame.transform.scale(load_image("pause.png"), (60, 60))
     win = True
     MYEVENTTYPE = pygame.USEREVENT + 1
     hp_image = pygame.transform.scale(load_image("health.png"), (40, 40))
-
     pygame.key.set_repeat(200, 30)
     clock = pygame.time.Clock()
     if y == 1:
         mob_speed, takt, STEP, HP = start_screen()
+        mount = random.choice(["mountains.png", "mountains_2.png", "mountains_3.png", "mountains_4.png"])
     else:
         mob_col = 10 + mission_screen() * 2
         if mob_col <= 22:
-            mob_speed, takt, STEP, HP = 1, 2000, 10, 3
+            mob_speed, takt, STEP, HP, mount = 1, 2000, 10, 3, "mountains_2.png"
         elif mob_col <= 33:
-            mob_speed, takt, STEP, HP = 3, 1500, 10, 2
+            mob_speed, takt, STEP, HP, mount = 3, 1500, 10, 2, "mountains_3.png"
         else:
-            mob_speed, takt, STEP, HP = 5, 1000, 20, 1
-
+            mob_speed, takt, STEP, HP, mount = 5, 1000, 20, 1, "mountains_4.png"
+    mountain = Mountain(mount)
     pygame.time.set_timer(MYEVENTTYPE, takt)
-    running = True
     pygame.display.set_caption("Поймай диверсантов")
     bom = pygame.mixer.Sound('data/Pop_up.wav')
     health = pygame.mixer.Sound("data/health.wav")
@@ -417,7 +430,7 @@ while True:
                     running = False
                     terminate()
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    if 720 <= event.pos[0] <= 780 and 30 <= event.pos[1] <= 90:
+                    if 720 - 88 <= event.pos[0] <= 780 - 88 and 30 <= event.pos[1] <= 90:
                         runn = True
                         while runn:
                             for event in pygame.event.get():
@@ -425,10 +438,10 @@ while True:
                                     if event.key == pygame.K_ESCAPE:
                                         runn = False
                                 elif event.type == pygame.MOUSEBUTTONDOWN:
-                                    if 720 <= event.pos[0] <= 780 and 30 <= event.pos[1] <= 90:
+                                    if 720 - 88 <= event.pos[0] <= 780 - 88 and 30 <= event.pos[1] <= 90:
                                         runn = False
                 if event.type == MYEVENTTYPE:
-                    pt = random.choice([pt_3, pt_4])
+                    pt = random.choice([(pt_3, 3), (pt_4, 4)])
                     Landing((random.randrange(width - 200), 0), pt)
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
@@ -461,7 +474,7 @@ while True:
             if hits:
                 x += 10
             screen.fill((0, 0, 0))
-            screen.blit(pause, (720, 30))
+
             all_sprites.draw(screen)
             all_sprites.update()
             gun_car.draw(screen)
@@ -478,9 +491,9 @@ while True:
                 screen.blit(hp_image, (50 + i * 50, 50))
 
             pygame.display.flip()
+            screen.blit(pause, (720 - 88, 30))
             clock.tick(50)
     else:
-        running = True
         while mob_col != 0 and running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -491,6 +504,9 @@ while True:
                         runn = True
                         while runn:
                             for event in pygame.event.get():
+                                if event.type == pygame.QUIT:
+                                    runn = False
+                                    terminate()
                                 if event.type == pygame.KEYDOWN:
                                     if event.key == pygame.K_ESCAPE:
                                         runn = False
@@ -498,7 +514,7 @@ while True:
                                     if 720 <= event.pos[0] <= 780 and 30 <= event.pos[1] <= 90:
                                         runn = False
                 if event.type == MYEVENTTYPE:
-                    pt = random.choice([pt_3, pt_4])
+                    pt = random.choice([(pt_3, 3), (pt_4, 4)])
                     Landing((random.randrange(width - 200), 0), pt)
 
                 elif event.type == pygame.KEYDOWN:
