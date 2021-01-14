@@ -181,11 +181,6 @@ def mission_screen():
                         win = False
                         running = False
                         return 0
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    win = False
-                    running = False
-                    return 0
                 col = 1
                 for i in range(3):
                     for j in range(5):
@@ -207,6 +202,12 @@ def mission_screen():
                             if event.type == pygame.MOUSEBUTTONDOWN:
                                 return col
                                 run = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    win = False
+                    running = False
+                    return 0
+
 
         pygame.display.flip()
 
