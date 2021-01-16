@@ -208,7 +208,6 @@ def mission_screen():
                     running = False
                     return 0
 
-
         pygame.display.flip()
 
 
@@ -311,6 +310,48 @@ def victory():
 
         pygame.display.flip()
         clock.tick(FPS)
+
+
+def create_particles(position):
+    # количество создаваемых частиц
+    particle_count = 40
+    # возможные скорости
+    numbers = range(-20, 24)
+    for _ in range(particle_count):
+        Particle(position, random.choice(numbers), random.choice(numbers))
+
+
+screen_rect = (0, 0, width, height)
+
+class Particle(pygame.sprite.Sprite):
+    # сгенерируем частицы разного размера
+    fire = [load_image("star.png")]
+    for scale in (5, 10, 20):
+        fire.append(pygame.transform.scale(fire[0], (scale, scale)))
+
+    def __init__(self, pos, dx, dy):
+        super().__init__(star)
+        self.image = random.choice(self.fire)
+        self.rect = self.image.get_rect()
+
+        # у каждой частицы своя скорость — это вектор
+        self.velocity = [dx, dy]
+        # и свои координаты
+        self.rect.x, self.rect.y = pos
+
+        # гравитация будет одинаковой (значение константы)
+        self.gravity = 1
+
+    def update(self):
+        # применяем гравитационный эффект:
+        # движение с ускорением под действием гравитации
+        self.velocity[1] += self.gravity
+        # перемещаем частицу
+        self.rect.x += self.velocity[0]
+        self.rect.y += self.velocity[1]
+        # убиваем, если частица ушла за экран
+        if not self.rect.colliderect(screen_rect):
+            self.kill()
 
 
 class Mountain(pygame.sprite.Sprite):
@@ -499,7 +540,7 @@ while True:
             mobs.update()
             for i in range(HP):
                 screen.blit(hp_image, (50 + i * 50, 50))
-            screen.blit(pause, (720 - 88, 30))
+            screen.blit(pause, (720 - 68, 30))
             pygame.display.flip()
 
             clock.tick(50)
@@ -579,4 +620,30 @@ while True:
             pygame.display.flip()
             clock.tick(50)
         if win:
+            STAREVENT = pygame.USEREVENT + 1
+            pygame.time.set_timer(STAREVENT, 1000)
+            star = pygame.sprite.Group()
+            clock = pygame.time.Clock()
+            running = True
+            create_particles((350, 100))
+            x = 3
+            while x != 0:
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        running = False
+                    if event.type == STAREVENT:
+                        x -= 1
+                        create_particles((random.randrange(200, 500, 100), 100))
+
+
+                star.update()
+                screen.fill((0, 0, 0))
+                all_sprites.draw(screen)
+                all_sprites.update()
+                gun_car.draw(screen)
+                star.draw(screen)
+                pygame.display.flip()
+                clock.tick(50)
+
+
             victory()
