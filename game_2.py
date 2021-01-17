@@ -569,6 +569,19 @@ while True:
                     Landing((random.randrange(width - 200), 0), pt)
 
                 elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_RIGHT:
+                        if gun.rect.x < width + 32:
+                            gun.rect.x += STEP
+                        else:
+                            gun.rect.x = 0
+                    if event.key == pygame.K_LEFT:
+                        if gun.rect.x > 0 - 32:
+                            gun.rect.x -= STEP
+                        else:
+                            gun.rect.x = width - 32
+                    if event.key == pygame.K_SPACE:
+                        gun.shoot()
+                        bom.play()
                     if event.key == pygame.K_ESCAPE:
                         runn = True
                         while runn:
@@ -583,19 +596,6 @@ while True:
                                 elif event.type == pygame.MOUSEBUTTONDOWN:
                                     if 720 <= event.pos[0] <= 780 and 30 <= event.pos[1] <= 90:
                                         runn = False
-                    if event.key == pygame.K_RIGHT:
-                        if gun.rect.x < width + 32:
-                            gun.rect.x += STEP
-                        else:
-                            gun.rect.x = 0
-                    if event.key == pygame.K_LEFT:
-                        if gun.rect.x > 0 - 32:
-                            gun.rect.x -= STEP
-                        else:
-                            gun.rect.x = width - 32
-                    if event.key == pygame.K_SPACE:
-                        gun.shoot()
-                        bom.play()
             hits = pygame.sprite.groupcollide(mobs, bullets, True, True)
             if hits:
                 x += 10
@@ -626,13 +626,13 @@ while True:
             clock = pygame.time.Clock()
             running = True
             create_particles((350, 100))
-            x = 3
-            while x != 0:
+            z = 3
+            while z != 0:
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         running = False
                     if event.type == STAREVENT:
-                        x -= 1
+                        z -= 1
                         create_particles((random.randrange(200, 500, 100), 100))
 
 
