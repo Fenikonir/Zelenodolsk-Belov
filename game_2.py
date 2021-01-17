@@ -232,7 +232,7 @@ def lose_screen():
         screen.blit(string_rendered, intro_rect)
     line = "Начать заново"
     rip = pygame.transform.scale(load_image("rip.jpg"), (200, 150))
-    screen.blit(rip, (50, 100))
+    screen.blit(rip, (50, 110))
 
     pygame.draw.rect(screen, (255, 255, 255), (50, 250, 200, 40), width=3)
     font = pygame.font.Font(None, 30)
