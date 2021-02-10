@@ -43,7 +43,8 @@ class Authorization(QtWidgets.QWidget):
         self.base_line_edit = [self.ui.le_login, self.ui.le_password]
 
     def auth(self):
-        name = self.ui.le_login.text()
+        name = self.ui.le_login.text().split(",")
+        name = ",".join([name[1], name[0]])
         zoom = self.ui.le_password.text()
         ex_auth.hide()
         main(name, zoom)
