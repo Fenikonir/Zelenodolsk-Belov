@@ -55,13 +55,16 @@ class Authorization(QtWidgets.QWidget):
         main(map)
 
 
+
 def main(map):
     # Инициализируем pygame
     pygame.init()
     screen = pygame.display.set_mode((600, 450))
+
     while True:
         event = pygame.event.wait()
         if event.type == pygame.QUIT:  # Выход из программы
+            os.remove(map_file)
             sys.exit(app.exec_())
             break
         # Создаем файл
@@ -80,3 +83,4 @@ if __name__ == '__main__':
     ex_auth.show()
 
     sys.exit(app.exec_())
+
